@@ -4,6 +4,7 @@ export const volunteers = sqliteTable("volunteers", {
   id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
   organizerName: text("name").notNull(),
   volunteerName: text("name").notNull(),
+  location: text("location").notNull(),
   eventDate: integer("event_date", { mode: "timestamp" }).notNull(),
   description: text("description").notNull(),
   isSharedToStudents: integer("is_shared_to_students", {
@@ -11,10 +12,10 @@ export const volunteers = sqliteTable("volunteers", {
   }).default(false),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(new Date()),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(new Date()),
+    .$defaultFn(() => new Date()),
 });
 
 export const users = sqliteTable("users", {
@@ -24,15 +25,15 @@ export const users = sqliteTable("users", {
   iconUrl: text("icon_url").notNull(),
   comment: text("comment").notNull(),
   qrCode: text("qr_code").notNull(),
-  isTeacher: integer({ mode: "boolean" }).default(false),
-  isStudent: integer({ mode: "boolean" }).default(false),
-  isOrganizer: integer({ mode: "boolean" }).default(false),
+  isTeacher: integer("is_teacher", { mode: "boolean" }).default(false),
+  isStudent: integer("is_student", { mode: "boolean" }).default(false),
+  isOrganizer: integer("is_organizer", { mode: "boolean" }).default(false),
   createdAt: integer("created_at", { mode: "timestamp" })
     .notNull()
-    .default(new Date()),
+    .$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
-    .default(new Date()),
+    .$defaultFn(() => new Date()),
 });
 
 export const userVolunteers = sqliteTable("users_volunteers", {
