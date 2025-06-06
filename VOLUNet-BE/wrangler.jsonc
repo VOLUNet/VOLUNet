@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "volunet-be",
   "main": "src/index.ts",
-  "compatibility_date": "2025-06-03"
+  "compatibility_date": "2025-06-03",
   // "compatibility_flags": [
   //   "nodejs_compat"
   // ],
@@ -21,13 +21,14 @@
   //     "bucket_name": "my-bucket"
   //   }
   // ],
-  // "d1_databases": [
-  //   {
-  //     "binding": "MY_DB",
-  //     "database_name": "my-database",
-  //     "database_id": ""
-  //   }
-  // ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-volunet",
+      "database_id": "2cded30d-2c81-4f4a-a371-8d77ad084d3c",
+      "migrations_dir": "drizzle"
+    }
+  ]
   // "ai": {
   //   "binding": "AI"
   // },
