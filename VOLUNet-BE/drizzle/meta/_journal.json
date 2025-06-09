@@ -15,6 +15,13 @@
       "when": 1749178521245,
       "tag": "0001_elite_starhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1749445140858,
+      "tag": "0002_broad_crusher_hogan",
+      "breakpoints": true
     }
   ]
 }
