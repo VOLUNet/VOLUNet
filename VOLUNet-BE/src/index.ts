@@ -46,4 +46,27 @@ app.post("/volunteer", async (c) => {
   }
 });
 
+// ボランティアリスト検索API
+app.get("/volunteer-list", async (c) => {
+  const db = drizzle(c.env.DB);
+
+  try {
+    const results = await db.select().from(volunteers);
+
+    const response = results.map((result) => ({
+      id: result.id,
+      volunteerName: result.volunteerName,
+      description: result.description,
+      organizationName: result.organizerName,
+      eventDate: result.eventDate,
+      location: result.location,
+    }));
+
+    return c.json(response);
+  } catch (e) {
+    c.status(500);
+    return c.json("ボランティアデータを正常に取得出来ませんでした。");
+  }
+});
+
 export default app;
