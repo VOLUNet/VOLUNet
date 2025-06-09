@@ -1,0 +1,1 @@
+ALTER TABLE `volunteers` ADD `location_image_url` text NOT NULL;

@@ -8,6 +8,7 @@ export const volunteers = sqliteTable("volunteers", {
   }).notNull(),
   volunteerName: text("name").notNull(),
   location: text("location").notNull(),
+  locationImageUrl: text("location_image_url").notNull(),
   eventDate: integer("event_date", { mode: "timestamp" }).notNull(),
   numPeople: integer("num_people").notNull(),
   description: text("description").notNull(),
