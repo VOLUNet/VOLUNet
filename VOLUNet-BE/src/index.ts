@@ -16,6 +16,7 @@ app.get("/health", (c) => {
 
 interface volunteerPost {
   category: "EnvironmentProtection" | "Welfare" | "CommunityActivity";
+  locationImageUrl: string;
   volunteerName: string;
   location: string;
   eventDate: Date;
@@ -31,6 +32,7 @@ app.post("/volunteer", async (c) => {
   try {
     const result = await db.insert(volunteers).values({
       organizerName: "TODO(小梶):organizerNameどうするつもりか聞く",
+      locationImageUrl: body.locationImageUrl,
       volunteerName: body.volunteerName,
       category: body.category,
       location: body.location,
