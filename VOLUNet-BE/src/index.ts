@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
-import { users, userVolunteers, volunteers } from "./db/schema";
+import { users, volunteers, userVolunteers } from "./db/schema";
 import { eq } from "drizzle-orm";
 
 type Bindings = {
@@ -16,6 +16,7 @@ app.get("/health", (c) => {
 });
 
 interface volunteerPost {
+  organizationName: string;
   category: "EnvironmentProtection" | "Welfare" | "CommunityActivity";
   locationImageUrl: string;
   volunteerName: string;
@@ -23,6 +24,7 @@ interface volunteerPost {
   eventDate: Date;
   numPeople: number;
   description: string;
+  userId: number;
 }
 
 // ボランティア登録用API
@@ -32,7 +34,7 @@ app.post("/volunteer", async (c) => {
 
   try {
     const result = await db.insert(volunteers).values({
-      organizerName: "TODO(小梶):organizerNameどうするつもりか聞く",
+      organizerName: body.organizationName,
       locationImageUrl: body.locationImageUrl,
       volunteerName: body.volunteerName,
       category: body.category,
@@ -40,6 +42,13 @@ app.post("/volunteer", async (c) => {
       eventDate: body.eventDate,
       numPeople: body.numPeople,
       description: body.description,
+    });
+
+    console.log("result");
+    console.log(result);
+    await db.insert(userVolunteers).values({
+      userId: body.userId,
+      volunteerId: 1,
     });
 
     return c.json({ message: "ボランティアデータを正常に登録しました。" });
@@ -109,6 +118,28 @@ app.get("/volunteer/:id", async (c) => {
   } catch (e) {
     c.status(500);
     return c.json("ボランティアデータを正常に取得出来ませんでした。");
+  }
+});
+
+// ボランティア共有状態変更API
+app.put("/volunteer/:id", async (c) => {
+  const db = drizzle(c.env.DB);
+  const id = Number(c.req.param("id"));
+
+  try {
+    await db
+      .update(volunteers)
+      .set({ isSharedToStudents: true })
+      .where(eq(volunteers.id, id));
+
+    return c.json({
+      message: "ボランティアデータの共有フラグを更新出来ました。",
+    });
+  } catch (e) {
+    c.status(500);
+    return c.json({
+      message: "ボランティアデータの共有フラグを更新出来ませんでした。",
+    });
   }
 });
 export default app;
