@@ -60,12 +60,18 @@ app.post("/volunteer", async (c) => {
 
 // ボランティアリスト検索API
 // 学生側はquery param に student:true を与える
+<<<<<<< HEAD
 // 過去実施されたボランティア一覧は query param に previuos:true を与える
+=======
+>>>>>>> 120f930 (feat(volunteer): ボランティアリスト(学生用)取得APIを実装する (#29))
 app.get("/volunteer-list", async (c) => {
   const db = drizzle(c.env.DB);
   const studentSideSearchFlag =
     c.req.query("student") === "true" ? true : false;
+<<<<<<< HEAD
   const previousSearchFlag = c.req.query("previous") === "true" ? true : false;
+=======
+>>>>>>> 120f930 (feat(volunteer): ボランティアリスト(学生用)取得APIを実装する (#29))
 
   try {
     if (studentSideSearchFlag) {
@@ -84,6 +90,7 @@ app.get("/volunteer-list", async (c) => {
       }));
 
       return c.json(response);
+<<<<<<< HEAD
     } else if (previousSearchFlag) {
       const currentTimeStamp = new Date();
       const results = await db
@@ -101,6 +108,8 @@ app.get("/volunteer-list", async (c) => {
       }));
 
       return c.json(response);
+=======
+>>>>>>> 120f930 (feat(volunteer): ボランティアリスト(学生用)取得APIを実装する (#29))
     } else {
       const results = await db.select().from(volunteers);
 
@@ -184,6 +193,7 @@ app.put("/volunteer/:id", async (c) => {
   }
 });
 
+<<<<<<< HEAD
 interface volunteerRegistarion {
   userId: string;
   volunteerId: string;
@@ -210,4 +220,6 @@ app.put("/volunteer-registrations", async (c) => {
   }
 });
 
+=======
+>>>>>>> 120f930 (feat(volunteer): ボランティアリスト(学生用)取得APIを実装する (#29))
 export default app;
