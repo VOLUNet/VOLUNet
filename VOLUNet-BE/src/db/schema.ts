@@ -10,7 +10,8 @@ export const volunteers = sqliteTable("volunteers", {
   location: text("location").notNull(),
   locationImageUrl: text("location_image_url").notNull(),
   eventDate: integer("event_date", { mode: "timestamp" }).notNull(),
-  numPeople: integer("num_people").notNull(),
+  currentPeople: integer("current_people").notNull(),
+  maxPeople: integer("max_people").notNull(),
   description: text("description").notNull(),
   isSharedToStudents: integer("is_shared_to_students", {
     mode: "boolean",
