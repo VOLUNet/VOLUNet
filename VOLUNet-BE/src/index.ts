@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { users, volunteers, userVolunteers } from "./db/schema";
+import { eq } from "drizzle-orm";
 
 type Bindings = {
   DB: DrizzleD1Database;
@@ -80,4 +81,25 @@ app.get("/volunteer-list", async (c) => {
   }
 });
 
+// ボランティア共有状態変更API
+app.put("/volunteer/:id", async (c) => {
+  const db = drizzle(c.env.DB);
+  const id = Number(c.req.param("id"));
+
+  try {
+    await db
+      .update(volunteers)
+      .set({ isSharedToStudents: true })
+      .where(eq(volunteers.id, id));
+
+    return c.json({
+      message: "ボランティアデータの共有フラグを更新出来ました。",
+    });
+  } catch (e) {
+    c.status(500);
+    return c.json({
+      message: "ボランティアデータの共有フラグを更新出来ませんでした。",
+    });
+  }
+});
 export default app;
