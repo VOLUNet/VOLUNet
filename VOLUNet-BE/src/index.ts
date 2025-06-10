@@ -60,22 +60,43 @@ app.post("/volunteer", async (c) => {
 });
 
 // ボランティアリスト検索API
+// 学生側はquery param に student:true を与える
 app.get("/volunteer-list", async (c) => {
   const db = drizzle(c.env.DB);
+  const studentSideSearchFlag =
+    c.req.query("student") === "true" ? true : false;
 
   try {
-    const results = await db.select().from(volunteers);
+    if (studentSideSearchFlag) {
+      const results = await db
+        .select()
+        .from(volunteers)
+        .where(eq(volunteers.isSharedToStudents, true));
 
-    const response = results.map((result) => ({
-      id: result.id,
-      volunteerName: result.volunteerName,
-      description: result.description,
-      organizationName: result.organizerName,
-      eventDate: result.eventDate,
-      location: result.location,
-    }));
+      const response = results.map((result) => ({
+        id: result.id,
+        volunteerName: result.volunteerName,
+        description: result.description,
+        organizationName: result.organizerName,
+        eventDate: result.eventDate,
+        location: result.location,
+      }));
 
-    return c.json(response);
+      return c.json(response);
+    } else {
+      const results = await db.select().from(volunteers);
+
+      const response = results.map((result) => ({
+        id: result.id,
+        volunteerName: result.volunteerName,
+        description: result.description,
+        organizationName: result.organizerName,
+        eventDate: result.eventDate,
+        location: result.location,
+      }));
+
+      return c.json(response);
+    }
   } catch (e) {
     c.status(500);
     return c.json("ボランティアデータを正常に取得出来ませんでした。");
@@ -144,4 +165,5 @@ app.put("/volunteer/:id", async (c) => {
     });
   }
 });
+
 export default app;
