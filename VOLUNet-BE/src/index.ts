@@ -22,7 +22,7 @@ interface volunteerPost {
   volunteerName: string;
   location: string;
   eventDate: Date;
-  numPeople: number;
+  maxPeople: number;
   description: string;
   userId: number;
 }
@@ -40,7 +40,8 @@ app.post("/volunteer", async (c) => {
       category: body.category,
       location: body.location,
       eventDate: body.eventDate,
-      numPeople: body.numPeople,
+      currentPeople: 0,
+      maxPeople: body.maxPeople,
       description: body.description,
     });
 
@@ -109,7 +110,8 @@ app.get("/volunteer/:id", async (c) => {
       volunteerName: volunteerSearchResult[0].volunteerName,
       eventDate: volunteerSearchResult[0].eventDate,
       location: volunteerSearchResult[0].location,
-      numPeople: volunteerSearchResult[0].numPeople,
+      currentPeople: volunteerSearchResult[0].currentPeople,
+      maxPeople: volunteerSearchResult[0].maxPeople,
       organizationName: volunteerSearchResult[0].organizerName,
       organizer: userSearchResult[0].name,
     };
