@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
-import { users, volunteers } from "./db/schema";
+import { users, volunteers, userVolunteers } from "./db/schema";
 
 type Bindings = {
   DB: DrizzleD1Database;
@@ -15,6 +15,7 @@ app.get("/health", (c) => {
 });
 
 interface volunteerPost {
+  organizationName: string;
   category: "EnvironmentProtection" | "Welfare" | "CommunityActivity";
   locationImageUrl: string;
   volunteerName: string;
@@ -22,6 +23,7 @@ interface volunteerPost {
   eventDate: Date;
   numPeople: number;
   description: string;
+  userId: number;
 }
 
 // ボランティア登録用API
@@ -31,7 +33,7 @@ app.post("/volunteer", async (c) => {
 
   try {
     const result = await db.insert(volunteers).values({
-      organizerName: "TODO(小梶):organizerNameどうするつもりか聞く",
+      organizerName: body.organizationName,
       locationImageUrl: body.locationImageUrl,
       volunteerName: body.volunteerName,
       category: body.category,
@@ -39,6 +41,13 @@ app.post("/volunteer", async (c) => {
       eventDate: body.eventDate,
       numPeople: body.numPeople,
       description: body.description,
+    });
+
+    console.log("result");
+    console.log(result);
+    await db.insert(userVolunteers).values({
+      userId: body.userId,
+      volunteerId: 1,
     });
 
     return c.json({ message: "ボランティアデータを正常に登録しました。" });
