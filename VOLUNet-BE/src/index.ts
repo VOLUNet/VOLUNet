@@ -166,4 +166,30 @@ app.put("/volunteer/:id", async (c) => {
   }
 });
 
+interface volunteerRegistarion {
+  userId: string;
+  volunteerId: string;
+}
+// ボランティア参加登録API
+app.put("/volunteer-registrations", async (c) => {
+  const db = drizzle(c.env.DB);
+  const body = c.req.json() as unknown as volunteerRegistarion;
+
+  try {
+    await db.insert(userVolunteers).values({
+      userId: Number(body.userId),
+      volunteerId: Number(body.volunteerId),
+    });
+
+    return c.json({
+      message: "ユーザとボランティアの紐づけが完了しました。",
+    });
+  } catch (e) {
+    c.status(500);
+    return c.json({
+      message: "ユーザとボランティアの紐づけが完了しませんでした。",
+    });
+  }
+});
+
 export default app;
