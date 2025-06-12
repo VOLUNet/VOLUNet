@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { users, volunteers, userVolunteers } from "./db/schema";
-import { eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 
 type Bindings = {
   DB: DrizzleD1Database;
@@ -61,10 +61,12 @@ app.post("/volunteer", async (c) => {
 
 // ボランティアリスト検索API
 // 学生側はquery param に student:true を与える
+// 過去実施されたボランティア一覧は query param に previuos:true を与える
 app.get("/volunteer-list", async (c) => {
   const db = drizzle(c.env.DB);
   const studentSideSearchFlag =
     c.req.query("student") === "true" ? true : false;
+  const previousSearchFlag = c.req.query("previous") === "true" ? true : false;
 
   try {
     if (studentSideSearchFlag) {
@@ -72,6 +74,23 @@ app.get("/volunteer-list", async (c) => {
         .select()
         .from(volunteers)
         .where(eq(volunteers.isSharedToStudents, true));
+
+      const response = results.map((result) => ({
+        id: result.id,
+        volunteerName: result.volunteerName,
+        description: result.description,
+        organizationName: result.organizerName,
+        eventDate: result.eventDate,
+        location: result.location,
+      }));
+
+      return c.json(response);
+    } else if (previousSearchFlag) {
+      const currentTimeStamp = new Date();
+      const results = await db
+        .select()
+        .from(volunteers)
+        .where(lt(volunteers.eventDate, currentTimeStamp));
 
       const response = results.map((result) => ({
         id: result.id,
