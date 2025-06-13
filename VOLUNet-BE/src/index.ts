@@ -30,7 +30,7 @@ interface volunteerPost {
 // ボランティア登録用API
 app.post("/volunteer", async (c) => {
   const db = drizzle(c.env.DB);
-  const body = c.req.json() as unknown as volunteerPost;
+  const body = await c.req.json() as unknown as volunteerPost;
 
   try {
     const result = await db.insert(volunteers).values({
@@ -45,15 +45,14 @@ app.post("/volunteer", async (c) => {
       description: body.description,
     });
 
-    console.log("result");
-    console.log(result);
     await db.insert(userVolunteers).values({
       userId: body.userId,
       volunteerId: 1,
     });
 
     return c.json({ message: "ボランティアデータを正常に登録しました。" });
-  } catch (e) {
+  } catch (e: any) {
+    console.error(e.message);
     c.status(500);
     return c.json("ボランティアデータを正常に登録出来ませんでした。");
   }
@@ -127,7 +126,7 @@ app.get("/volunteer/:id", async (c) => {
   const db = drizzle(c.env.DB);
   const id = Number(c.req.param("id"));
 
-  // TODO:promise.allでまとめるべき
+    // TODO:promise.allでまとめるべき
   try {
     const volunteerSearchResult = await db
       .select()
@@ -192,7 +191,7 @@ interface volunteerRegistarion {
 // ボランティア参加登録API
 app.put("/volunteer-registrations", async (c) => {
   const db = drizzle(c.env.DB);
-  const body = c.req.json() as unknown as volunteerRegistarion;
+  const body = await c.req.json() as unknown as volunteerRegistarion;
 
   try {
     await db.insert(userVolunteers).values({
