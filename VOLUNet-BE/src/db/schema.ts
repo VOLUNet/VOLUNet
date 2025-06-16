@@ -27,7 +27,7 @@ export const volunteers = sqliteTable("volunteers", {
 export const users = sqliteTable("users", {
   id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
-  email: text("name").notNull(),
+  email: text("email").notNull(),
   iconUrl: text("icon_url").notNull(),
   comment: text("comment").notNull(),
   qrCode: text("qr_code").notNull(),
