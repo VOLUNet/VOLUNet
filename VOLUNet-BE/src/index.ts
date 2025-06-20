@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { users, volunteers, userVolunteers } from "./db/schema";
 import { eq, lt } from "drizzle-orm";
+import { userSeed } from "./db/seed/users";
 
 type Bindings = {
   DB: DrizzleD1Database;
@@ -13,6 +14,20 @@ app.get("/health", (c) => {
   return c.json({
     message: "service up",
   });
+});
+
+// シード用API
+app.get("/seed", async (c) => {
+  const db = drizzle(c.env.DB);
+
+  try {
+    const result = await db.insert(users).values(userSeed);
+
+    return c.json({ message: "シードを正しく挿入出来ました。" });
+  } catch (e) {
+    c.status(500);
+    return c.json("シードを正しく挿入出来ませんでした。");
+  }
 });
 
 interface volunteerPost {
@@ -30,7 +45,7 @@ interface volunteerPost {
 // ボランティア登録用API
 app.post("/volunteer", async (c) => {
   const db = drizzle(c.env.DB);
-  const body = await c.req.json() as unknown as volunteerPost;
+  const body = (await c.req.json()) as unknown as volunteerPost;
 
   try {
     const result = await db.insert(volunteers).values({
@@ -126,7 +141,7 @@ app.get("/volunteer/:id", async (c) => {
   const db = drizzle(c.env.DB);
   const id = Number(c.req.param("id"));
 
-    // TODO:promise.allでまとめるべき
+  // TODO:promise.allでまとめるべき
   try {
     const volunteerSearchResult = await db
       .select()
@@ -191,7 +206,7 @@ interface volunteerRegistarion {
 // ボランティア参加登録API
 app.put("/volunteer-registrations", async (c) => {
   const db = drizzle(c.env.DB);
-  const body = await c.req.json() as unknown as volunteerRegistarion;
+  const body = (await c.req.json()) as unknown as volunteerRegistarion;
 
   try {
     await db.insert(userVolunteers).values({
