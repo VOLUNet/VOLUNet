@@ -3,6 +3,7 @@ import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { users, volunteers, userVolunteers } from "./db/schema";
 import { eq, lt } from "drizzle-orm";
 import { userSeed } from "./db/seed/users";
+import { volunteerSeed } from "./db/seed/volunteers";
 
 type Bindings = {
   DB: DrizzleD1Database;
@@ -21,7 +22,10 @@ app.get("/seed", async (c) => {
   const db = drizzle(c.env.DB);
 
   try {
-    const result = await db.insert(users).values(userSeed);
+    await Promise.all([
+      db.insert(users).values(userSeed),
+      db.insert(volunteers).values(volunteerSeed),
+    ]);
 
     return c.json({ message: "シードを正しく挿入出来ました。" });
   } catch (e) {
