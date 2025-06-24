@@ -37,6 +37,7 @@ app.get("/seed", async (c) => {
 
     return c.json({ message: "シードを正しく挿入出来ました。" });
   } catch (e) {
+    console.log(e);
     c.status(500);
     return c.json("シードを正しく挿入出来ませんでした。");
   }
