@@ -3,12 +3,20 @@ import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { users, volunteers, userVolunteers } from "./db/schema";
 import { eq, lt } from "drizzle-orm";
 import { userSeed } from "./db/seed/users";
+import { cors } from "hono/cors";
 
 type Bindings = {
   DB: DrizzleD1Database;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+app.use(
+  "*",
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 app.get("/health", (c) => {
   return c.json({

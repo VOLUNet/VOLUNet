@@ -13,10 +13,11 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useVolunteerStore, type VolunteerActivity } from "@/lib/store";
+import { type VolunteerActivity } from "@/lib/store";
+import axios from "axios";
 
 export default function TeacherVolunteerListPage() {
-  const activities = useVolunteerStore((state) => state.activities);
+  //ボランティアリスト
   const [volunteerActivities, setVolunteerActivities] = useState<
     VolunteerActivity[]
   >([]);
@@ -24,11 +25,15 @@ export default function TeacherVolunteerListPage() {
   // 初期化時にストアからデータを取得
   useEffect(() => {
     // 募集中のボランティアのみ表示
-    const activeActivities = activities.filter(
-      (activity) => activity.status === "募集中"
-    );
-    setVolunteerActivities(activeActivities);
-  }, [activities]);
+    axios
+      .get("http://localhost:8787/volunteer-list")
+      .then((response) => {
+        setVolunteerActivities(response.data);
+      })
+      .catch((error) => {
+        console.error("ボランティア取得エラー:", error);
+      });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">

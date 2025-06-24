@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Calendar, MapPin, Users, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useVolunteerStore, type VolunteerActivity } from "@/lib/store";
+import { type VolunteerActivity } from "@/lib/store";
+import axios from "axios";
 
 export default function SearchPage() {
-  const activities = useVolunteerStore((state) => state.activities);
   const [volunteerActivities, setVolunteerActivities] = useState<
     VolunteerActivity[]
   >([]);
@@ -16,11 +16,15 @@ export default function SearchPage() {
   // 初期化時にストアからデータを取得
   useEffect(() => {
     // 募集中かつ先生によって共有されたボランティアのみ表示
-    const sharedActivities = activities.filter(
-      (activity) => activity.status === "募集中" && activity.sharedByTeacher
-    );
-    setVolunteerActivities(sharedActivities);
-  }, [activities]);
+    axios
+      .get("http://localhost:8787/volunteer-list?student=true")
+      .then((response) => {
+        setVolunteerActivities(response.data);
+      })
+      .catch((error) => {
+        console.error("ボランティア取得エラー", error);
+      });
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
