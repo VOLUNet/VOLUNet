@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { drizzle, DrizzleD1Database } from "drizzle-orm/d1";
 import { users, volunteers, userVolunteers } from "./db/schema";
 import { eq, lt } from "drizzle-orm";
-import { userSeed } from "./db/seed/users";
 import { cors } from "hono/cors";
+import { userSeed } from "./db/seed/users";
 import { volunteerSeed } from "./db/seed/volunteers";
 
 type Bindings = {
@@ -20,12 +20,10 @@ app.use(
 );
 
 app.get("/health", (c) => {
-  return c.json({
-    message: "service up",
-  });
+  return c.json({ message: "service up" });
 });
 
-// シード用API
+// ── シード用API ─────────────────────────────────────────
 app.get("/seed", async (c) => {
   const db = drizzle(c.env.DB);
 
@@ -34,15 +32,15 @@ app.get("/seed", async (c) => {
       db.insert(users).values(userSeed),
       db.insert(volunteers).values(volunteerSeed),
     ]);
-
     return c.json({ message: "シードを正しく挿入出来ました。" });
-  } catch (e) {
-    console.log(e);
+  } catch (e: any) {
+    console.log(e.stack);
     c.status(500);
     return c.json("シードを正しく挿入出来ませんでした。");
   }
 });
 
+// ── 型定義 ─────────────────────────────────────────────
 interface volunteerPost {
   organizationName: string;
   category: "EnvironmentProtection" | "Welfare" | "CommunityActivity";
@@ -55,13 +53,22 @@ interface volunteerPost {
   userId: number;
 }
 
-// ボランティア登録用API
+interface volunteerRegistration {
+  userId: string;
+  volunteerId: string;
+}
+
+// ── ボランティア登録用API (POST /volunteer) ────────────
 app.post("/volunteer", async (c) => {
   const db = drizzle(c.env.DB);
-  const body = (await c.req.json()) as unknown as volunteerPost;
+  const raw = await c.req.json();
+  const body = {
+    ...(raw as any),
+    eventDate: new Date((raw as any).eventDate),
+  } as volunteerPost;
 
   try {
-    const result = await db.insert(volunteers).values({
+    await db.insert(volunteers).values({
       organizerName: body.organizationName,
       locationImageUrl: body.locationImageUrl,
       volunteerName: body.volunteerName,
@@ -72,125 +79,100 @@ app.post("/volunteer", async (c) => {
       maxPeople: body.maxPeople,
       description: body.description,
     });
-
-    await db.insert(userVolunteers).values({
-      userId: body.userId,
-      volunteerId: 1,
-    });
-
     return c.json({ message: "ボランティアデータを正常に登録しました。" });
   } catch (e: any) {
-    console.error(e.message);
+    console.error(e.stack);
     c.status(500);
     return c.json("ボランティアデータを正常に登録出来ませんでした。");
   }
 });
 
-// ボランティアリスト検索API
-// 学生側はquery param に student:true を与える
-// 過去実施されたボランティア一覧は query param に previuos:true を与える
+// ── ボランティアリスト検索API (GET /volunteer-list) ──────
 app.get("/volunteer-list", async (c) => {
   const db = drizzle(c.env.DB);
-  const studentSideSearchFlag =
-    c.req.query("student") === "true" ? true : false;
-  const previousSearchFlag = c.req.query("previous") === "true" ? true : false;
+  const studentSide = c.req.query("student") === "true";
+  const previous = c.req.query("previous") === "true";
 
   try {
-    if (studentSideSearchFlag) {
-      const results = await db
+    let results = await db.select().from(volunteers);
+    if (studentSide) {
+      results = await db
         .select()
         .from(volunteers)
         .where(eq(volunteers.isSharedToStudents, true));
-
-      const response = results.map((result) => ({
-        id: result.id,
-        volunteerName: result.volunteerName,
-        description: result.description,
-        organizationName: result.organizerName,
-        eventDate: result.eventDate,
-        location: result.location,
-      }));
-
-      return c.json(response);
-    } else if (previousSearchFlag) {
-      const currentTimeStamp = new Date();
-      const results = await db
+    } else if (previous) {
+      results = await db
         .select()
         .from(volunteers)
-        .where(lt(volunteers.eventDate, currentTimeStamp));
-
-      const response = results.map((result) => ({
-        id: result.id,
-        volunteerName: result.volunteerName,
-        description: result.description,
-        organizationName: result.organizerName,
-        eventDate: result.eventDate,
-        location: result.location,
-      }));
-
-      return c.json(response);
-    } else {
-      const results = await db.select().from(volunteers);
-
-      const response = results.map((result) => ({
-        id: result.id,
-        volunteerName: result.volunteerName,
-        description: result.description,
-        organizationName: result.organizerName,
-        eventDate: result.eventDate,
-        location: result.location,
-      }));
-
-      return c.json(response);
+        .where(lt(volunteers.eventDate, new Date()));
     }
-  } catch (e) {
+
+    return c.json(
+      results.map((r) => ({
+        id: r.id,
+        volunteerName: r.volunteerName,
+        description: r.description,
+        organizationName: r.organizerName,
+        eventDate: r.eventDate,
+        location: r.location,
+      }))
+    );
+  } catch (e: any) {
+    console.error(e.stack);
     c.status(500);
     return c.json("ボランティアデータを正常に取得出来ませんでした。");
   }
 });
 
-// ボランティア単体取得(教員用)
+// ── ボランティア単体取得API (GET /volunteer/:id) ─────────
 app.get("/volunteer/:id", async (c) => {
   const db = drizzle(c.env.DB);
   const id = Number(c.req.param("id"));
 
-  // TODO:promise.allでまとめるべき
   try {
-    const volunteerSearchResult = await db
-      .select()
-      .from(volunteers)
-      .where(eq(volunteers.id, id));
+    const vol = await db.select().from(volunteers).where(eq(volunteers.id, id));
+    if (vol.length === 0) {
+      c.status(404);
+      return c.json({ error: "ボランティアイベントが見つかりません。" });
+    }
 
-    const userVolunteerSearchResult = await db
+    const uv = await db
       .select()
       .from(userVolunteers)
       .where(eq(userVolunteers.volunteerId, id));
+    if (uv.length === 0) {
+      c.status(404);
+      return c.json({ error: "該当ボランティアへの参加者が見つかりません。" });
+    }
 
-    const userSearchResult = await db
+    const usr = await db
       .select()
       .from(users)
-      .where(eq(users.id, userVolunteerSearchResult[0].userId));
+      .where(eq(users.id, uv[0].userId));
+    if (usr.length === 0) {
+      c.status(404);
+      return c.json({ error: "主催者ユーザーが見つかりません。" });
+    }
 
-    const response = {
-      category: volunteerSearchResult[0].category,
-      locationImageUrl: volunteerSearchResult[0].locationImageUrl,
-      volunteerName: volunteerSearchResult[0].volunteerName,
-      eventDate: volunteerSearchResult[0].eventDate,
-      location: volunteerSearchResult[0].location,
-      currentPeople: volunteerSearchResult[0].currentPeople,
-      maxPeople: volunteerSearchResult[0].maxPeople,
-      organizationName: volunteerSearchResult[0].organizerName,
-      organizer: userSearchResult[0].name,
-    };
-
-    return c.json(response);
-  } catch (e) {
+    return c.json({
+      category: vol[0].category,
+      locationImageUrl: vol[0].locationImageUrl,
+      volunteerName: vol[0].volunteerName,
+      eventDate: vol[0].eventDate,
+      location: vol[0].location,
+      currentPeople: vol[0].currentPeople,
+      maxPeople: vol[0].maxPeople,
+      organizationName: vol[0].organizerName,
+      organizer: usr[0].name,
+    });
+  } catch (e: any) {
+    console.error(e.stack);
     c.status(500);
     return c.json("ボランティアデータを正常に取得出来ませんでした。");
   }
 });
 
-// ボランティア共有状態変更API
+// ── ボランティア共有状態変更API (PUT /volunteer/:id) ────
 app.put("/volunteer/:id", async (c) => {
   const db = drizzle(c.env.DB);
   const id = Number(c.req.param("id"));
@@ -200,41 +182,32 @@ app.put("/volunteer/:id", async (c) => {
       .update(volunteers)
       .set({ isSharedToStudents: true })
       .where(eq(volunteers.id, id));
-
-    return c.json({
-      message: "ボランティアデータの共有フラグを更新出来ました。",
-    });
-  } catch (e) {
+    return c.json({ message: "共有フラグを更新しました。" });
+  } catch (e: any) {
+    console.error(e.stack);
     c.status(500);
-    return c.json({
-      message: "ボランティアデータの共有フラグを更新出来ませんでした。",
-    });
+    return c.json("共有フラグの更新に失敗しました。");
   }
 });
 
-interface volunteerRegistarion {
-  userId: string;
-  volunteerId: string;
-}
-// ボランティア参加登録API
+// ── ボランティア参加登録API (PUT /volunteer-registrations) ──
 app.put("/volunteer-registrations", async (c) => {
   const db = drizzle(c.env.DB);
-  const body = (await c.req.json()) as unknown as volunteerRegistarion;
+  const raw = await c.req.json();
+  const userId = Number((raw as any).userId);
+  const volunteerId = Number((raw as any).volunteerId);
+  if (Number.isNaN(userId) || Number.isNaN(volunteerId)) {
+    c.status(400);
+    return c.json({ error: "userId または volunteerId が不正です。" });
+  }
 
   try {
-    await db.insert(userVolunteers).values({
-      userId: Number(body.userId),
-      volunteerId: Number(body.volunteerId),
-    });
-
-    return c.json({
-      message: "ユーザとボランティアの紐づけが完了しました。",
-    });
-  } catch (e) {
+    await db.insert(userVolunteers).values({ userId, volunteerId });
+    return c.json({ message: "紐づけ完了しました。" });
+  } catch (e: any) {
+    console.error(e.stack);
     c.status(500);
-    return c.json({
-      message: "ユーザとボランティアの紐づけが完了しませんでした。",
-    });
+    return c.json("紐づけに失敗しました。");
   }
 });
 
