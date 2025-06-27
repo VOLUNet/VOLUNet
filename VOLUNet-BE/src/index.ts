@@ -67,15 +67,17 @@ app.post("/volunteer", async (c) => {
       volunteerName: body.volunteerName,
       category: body.category,
       location: body.location,
-      eventDate: body.eventDate,
+      eventDate: new Date(body.eventDate),
       currentPeople: 0,
       maxPeople: body.maxPeople,
       description: body.description,
     });
 
+    const lastInsertId = result.meta.last_row_id;
+
     await db.insert(userVolunteers).values({
       userId: body.userId,
-      volunteerId: 1,
+      volunteerId: lastInsertId,
     });
 
     return c.json({ message: "ボランティアデータを正常に登録しました。" });
