@@ -1,0 +1,18 @@
+name: Unit Test
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  unit_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリを取得する
+        uses: actions/checkout@v4
+
+      - name: npm installを行う
+        run: npm install
+
+      - name: テストを実行する
+        run: npm run test:ci
