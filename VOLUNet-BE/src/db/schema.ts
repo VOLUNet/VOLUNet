@@ -2,11 +2,11 @@ import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const volunteers = sqliteTable("volunteers", {
   id: integer({ mode: "number" }).primaryKey({ autoIncrement: true }),
-  organizerName: text("name").notNull(),
+  organizerName: text("organizer_name").notNull(),
   category: text({
     enum: ["EnvironmentProtection", "Welfare", "CommunityActivity"],
   }).notNull(),
-  volunteerName: text("name").notNull(),
+  volunteerName: text("volunteer_name").notNull(),
   location: text("location").notNull(),
   locationImageUrl: text("location_image_url").notNull(),
   eventDate: integer("event_date", { mode: "timestamp" }).notNull(),
