@@ -1,12 +1,14 @@
+import { volunteers } from "../schema";
+
 export const volunteerSeed = [
-  // これから実施されるボランティア（未来2件）
+  // ── これから実施されるボランティア（未来2件） ──
   {
     organizerName: "梅田環境美化推進会",
     category: "EnvironmentProtection",
     volunteerName: "茶屋町周辺のごみ拾い活動",
     location: "大阪府大阪市北区茶屋町",
     locationImageUrl:
-      "https://drive.google.com/file/d/1RDZtRHEMaGprgT9gj4ugYgUzxi_okvZO/view?usp=sharing",
+      "https://lh3.googleusercontent.com/d/1RDZtRHEMaGprgT9gj4ugYgUzxi_okvZO=s1200",
     eventDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     currentPeople: 8,
     maxPeople: 20,
@@ -21,7 +23,7 @@ export const volunteerSeed = [
     volunteerName: "中津町の高齢者見守り訪問",
     location: "大阪府大阪市北区中津",
     locationImageUrl:
-      "https://drive.google.com/file/d/1_bX2KIW46s8ub4Mu6FLVKlRpuWAfFhkn/view?usp=sharing",
+      "https://lh3.googleusercontent.com/d/1_bX2KIW46s8ub4Mu6FLVKlRpuWAfFhkn=s1200",
     eventDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
     currentPeople: 5,
     maxPeople: 10,
@@ -31,14 +33,14 @@ export const volunteerSeed = [
     updatedAt: new Date(),
   },
 
-  // すでに終了したボランティア（過去2件）
+  // ── すでに終了したボランティア（過去2件） ──
   {
     organizerName: "大阪駅前第3ビル自治会",
     category: "CommunityActivity",
     volunteerName: "地域夏祭りの設営・案内ボランティア",
     location: "大阪府大阪市北区梅田",
     locationImageUrl:
-      "https://drive.google.com/file/d/14olC8Wx3Jatg9O4mvg-vWt3UPRr904Ob/view?usp=sharing",
+      "https://lh3.googleusercontent.com/d/14olC8Wx3Jatg9O4mvg-vWt3UPRr904Ob=s1200",
     eventDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     currentPeople: 18,
     maxPeople: 25,
@@ -53,7 +55,7 @@ export const volunteerSeed = [
     volunteerName: "扇町公園の落ち葉掃除と花壇整備",
     location: "大阪府大阪市北区扇町",
     locationImageUrl:
-      "https://drive.google.com/file/d/1X6B8qqeF8LjrMYmFeP3PBOgNpMtQckfg/view?usp=sharing",
+      "https://lh3.googleusercontent.com/d/1X6B8qqeF8LjrMYmFeP3PBOgNpMtQckfg=s1200",
     eventDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
     currentPeople: 12,
     maxPeople: 15,
@@ -62,4 +64,4 @@ export const volunteerSeed = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-];
+] satisfies Array<typeof volunteers.$inferInsert>;
