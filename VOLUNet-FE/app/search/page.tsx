@@ -13,17 +13,12 @@ export default function SearchPage() {
     VolunteerActivity[]
   >([]);
 
-  // 初期化時にストアからデータを取得
+  // 募集中かつ先生によって共有されたボランティアのみ取得
   useEffect(() => {
-    // 募集中かつ先生によって共有されたボランティアのみ表示
     axios
-      .get("http://localhost:8787/volunteer-list?student=true")
-      .then((response) => {
-        setVolunteerActivities(response.data);
-      })
-      .catch((error) => {
-        console.error("ボランティア取得エラー", error);
-      });
+      .get<VolunteerActivity[]>("http://localhost:8787/volunteer-list?student=true")
+      .then((response) => setVolunteerActivities(response.data))
+      .catch((error) => console.error("ボランティア取得エラー", error));
   }, []);
 
   return (
@@ -42,7 +37,7 @@ export default function SearchPage() {
             <h1 className="text-2xl font-bold text-slate-900">
               ボランティア一覧
             </h1>
-            <div className="w-20"></div> {/* Spacer for centering */}
+            <div className="w-20" /> {/* Spacer for centering */}
           </div>
 
           {/* Info Card */}
@@ -75,11 +70,11 @@ export default function SearchPage() {
                 {/* Activity Image */}
                 <div className="relative mb-4">
                   <Image
-                    src={activity.image || "/placeholder.svg"}
+                    src={activity.locationImageUrl || "/placeholder.svg"}
                     alt={activity.title}
-                    width={120}
-                    height={120}
-                    className="w-full h-32 object-cover rounded-2xl"
+                    width={320}
+                    height={180}
+                    className="w-full h-40 object-cover rounded-2xl"
                   />
                   <div className="absolute top-3 left-3">
                     <span className="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-xs font-medium text-slate-700">
@@ -93,14 +88,14 @@ export default function SearchPage() {
                   </div>
                 </div>
 
-                {/* Activity Info - flex-grow to fill available space */}
+                {/* Activity Info */}
                 <div className="space-y-3 flex-grow flex flex-col">
                   <h3 className="text-lg font-semibold text-slate-900 group-hover:text-slate-700 transition-colors">
                     {activity.title}
                   </h3>
 
                   <Link href={`/volunteer/${activity.id}`}>
-                    <p className="text-sm text-slate-600 line-clamp-2 flex-grow hover:text-slate-800 cursor-pointer transition-colors">
+                    <p className="text-sm text-slate-600 line-clamp-2 flex-grow hover:text-slate-800 transition-colors">
                       {activity.description}
                     </p>
                   </Link>
@@ -127,7 +122,7 @@ export default function SearchPage() {
                     </div>
                   </div>
 
-                  {/* Apply Button - positioned at bottom */}
+                  {/* Apply Button */}
                   <div className="pt-4">
                     <Link href={`/volunteer/${activity.id}`}>
                       <Button className="w-full bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white rounded-xl py-2 text-sm font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">

@@ -107,7 +107,7 @@ export default function ConfirmPage({ params }: ConfirmPageProps) {
                 <Checkbox
                   id="terms"
                   checked={agreeToTerms}
-                  onCheckedChange={(checked) => setAgreeToTerms(checked === true)}
+                  onCheckedChange={(checked: boolean) => setAgreeToTerms(checked)}
                   className="mt-1"
                 />
                 <label htmlFor="terms" className="text-slate-700 leading-relaxed cursor-pointer">
