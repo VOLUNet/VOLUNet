@@ -111,6 +111,7 @@ app.get("/volunteer-list", async (c) => {
         organizationName: result.organizerName,
         eventDate: result.eventDate,
         location: result.location,
+        locationImageUrl: result.locationImageUrl,
       }));
 
       return c.json(response);
@@ -128,6 +129,7 @@ app.get("/volunteer-list", async (c) => {
         organizationName: result.organizerName,
         eventDate: result.eventDate,
         location: result.location,
+        locationImageUrl: result.locationImageUrl,
       }));
 
       return c.json(response);
@@ -141,6 +143,7 @@ app.get("/volunteer-list", async (c) => {
         organizationName: result.organizerName,
         eventDate: result.eventDate,
         location: result.location,
+        locationImageUrl: result.locationImageUrl,
       }));
 
       return c.json(response);

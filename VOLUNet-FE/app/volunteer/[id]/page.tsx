@@ -1,36 +1,37 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowLeft, Calendar, MapPin, Users, Clock, User } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useVolunteerStore, type VolunteerActivity } from "@/lib/store"
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Calendar, MapPin, Clock, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useVolunteerStore, type VolunteerActivity } from "@/lib/store";
+import { useParams } from "next/navigation";
 
-interface VolunteerDetailPageProps {
-  params: {
-    id: string
-  }
-}
-
-export default function VolunteerDetailPage({ params }: VolunteerDetailPageProps) {
-  const activities = useVolunteerStore((state) => state.activities)
-  const [volunteerActivity, setVolunteerActivity] = useState<VolunteerActivity | null>(null)
+export default function VolunteerDetailPage() {
+  const { id } = useParams();
+  const activities = useVolunteerStore((state) => state.activities);
+  const [volunteerActivity, setVolunteerActivity] =
+    useState<VolunteerActivity | null>(null);
 
   useEffect(() => {
     // IDに基づいて活動を検索
-    const activity = activities.find((a) => a.id === Number.parseInt(params.id))
+    const activity = activities.find(
+      (a) => a.id === Number.parseInt(id as string)
+    );
     if (activity) {
-      setVolunteerActivity(activity)
+      setVolunteerActivity(activity);
     }
-  }, [activities, params.id])
+  }, [activities, id]);
 
   // 活動が見つからない場合
   if (!volunteerActivity) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
         <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/50 shadow-lg text-center">
-          <h1 className="text-2xl font-bold text-slate-900 mb-4">ボランティア活動が見つかりません</h1>
+          <h1 className="text-2xl font-bold text-slate-900 mb-4">
+            ボランティア活動が見つかりません
+          </h1>
           <p className="text-slate-600 mb-6">
             指定されたIDのボランティア活動は存在しないか、削除された可能性があります。
           </p>
@@ -41,7 +42,7 @@ export default function VolunteerDetailPage({ params }: VolunteerDetailPageProps
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -57,7 +58,9 @@ export default function VolunteerDetailPage({ params }: VolunteerDetailPageProps
               <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
               <span className="font-medium">戻る</span>
             </Link>
-            <h1 className="text-2xl font-bold text-slate-900">ボランティア詳細</h1>
+            <h1 className="text-2xl font-bold text-slate-900">
+              ボランティア詳細
+            </h1>
             <div className="w-20"></div> {/* Spacer for centering */}
           </div>
 
@@ -73,14 +76,11 @@ export default function VolunteerDetailPage({ params }: VolunteerDetailPageProps
                   height={300}
                   className="w-full h-64 object-cover rounded-2xl"
                 />
-                <div className="absolute top-4 left-4">
-                  <span className="px-3 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-sm font-medium text-slate-700">
-                    {volunteerActivity.category}
-                  </span>
-                </div>
               </div>
 
-              <h1 className="text-3xl font-bold text-slate-900 mb-6">{volunteerActivity.title}</h1>
+              <h1 className="text-3xl font-bold text-slate-900 mb-6">
+                {volunteerActivity.title}
+              </h1>
 
               {/* Activity Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -104,14 +104,6 @@ export default function VolunteerDetailPage({ params }: VolunteerDetailPageProps
                     <span className="font-medium">場所:</span>
                     <span className="ml-2">{volunteerActivity.location}</span>
                   </div>
-
-                  <div className="flex items-center text-slate-600">
-                    <Users className="h-5 w-5 mr-3 text-slate-400" />
-                    <span className="font-medium">参加状況:</span>
-                    <span className="ml-2">
-                      {volunteerActivity.participants}/{volunteerActivity.maxParticipants}人
-                    </span>
-                  </div>
                 </div>
               </div>
             </div>
@@ -128,7 +120,9 @@ export default function VolunteerDetailPage({ params }: VolunteerDetailPageProps
                   className="rounded-xl border-2 border-white shadow-sm"
                 />
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-slate-900">{volunteerActivity.organizer}</h3>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    {volunteerActivity.organizer}
+                  </h3>
                   <div className="flex items-center space-x-4 text-sm text-slate-600">
                     <div className="flex items-center">
                       <User className="h-4 w-4 mr-1 text-purple-500" />
@@ -141,28 +135,38 @@ export default function VolunteerDetailPage({ params }: VolunteerDetailPageProps
 
             {/* Activity Description */}
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/50 shadow-lg">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">活動概要</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-4">
+                活動概要
+              </h2>
               <div className="prose prose-slate max-w-none">
-                <p className="text-slate-700 leading-relaxed whitespace-pre-line">{volunteerActivity.description}</p>
+                <p className="text-slate-700 leading-relaxed whitespace-pre-line">
+                  {volunteerActivity.description}
+                </p>
               </div>
             </div>
 
             {/* Apply Button */}
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/50 shadow-lg">
               <div className="text-center">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">このボランティアに参加しませんか？</h3>
-                <p className="text-slate-600 mb-6">参加をご希望の方は、下記のボタンから応募してください。</p>
-                <Link href={`/volunteer/${params.id}/confirm`}>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                  このボランティアに参加しませんか？
+                </h3>
+                <p className="text-slate-600 mb-6">
+                  参加をご希望の方は、下記のボタンから応募してください。
+                </p>
+                <Link href={`/volunteer/${id}/confirm`}>
                   <Button className="bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white rounded-xl px-12 py-4 text-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                     応募する
                   </Button>
                 </Link>
-                <p className="text-xs text-slate-500 mt-4">※応募後、主催者から詳細な連絡があります</p>
+                <p className="text-xs text-slate-500 mt-4">
+                  ※応募後、主催者から詳細な連絡があります
+                </p>
               </div>
             </div>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
