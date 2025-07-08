@@ -100,21 +100,21 @@ export default function OrganizerProfilePage() {
       title: "地域清掃ボランティア",
       date: "2024年1月15日",
       location: "大阪城公園",
-      image: "/placeholder.svg?height=80&width=80",
+      image: "/oosakajou.jpg?height=80&width=80",
     },
     {
       id: 2,
       title: "高齢者支援活動",
       date: "2024年1月22日",
       location: "住吉区コミュニティセンター",
-      image: "/placeholder.svg?height=80&width=80",
+      image: "/sumiyosi.jpg?height=80&width=80",
     },
     {
       id: 3,
       title: "子ども食堂お手伝い",
       date: "2024年2月5日",
       location: "天王寺区民センター",
-      image: "/placeholder.svg?height=80&width=80",
+      image: "/tennnouzi.jpg?height=80&width=80",
     },
   ]
 

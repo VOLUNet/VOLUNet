@@ -14,8 +14,8 @@ import { Button } from "@/components/ui/button";
 export default function ParticipantProfilePage() {
   // サンプルデータ
   const user = {
-    name: "佐藤 花子",
-    avatar: "/hakusyu_girl2.png?height=120&width=120",
+    name: "杉村　志弥",
+    avatar: "/ruru.jpg?height=120&width=120",
     rating: 4.6,
     reviewCount: 18,
     participationCount: 36, // 参加数
@@ -33,7 +33,7 @@ export default function ParticipantProfilePage() {
       organizer: "大阪環境サークル",
       status: "完了",
       rating: 5,
-      image: "/placeholder.svg?height=80&width=80",
+      image: "/oosakajou.jpg?height=80&width=80",
     },
     {
       id: 2,
@@ -43,7 +43,7 @@ export default function ParticipantProfilePage() {
       organizer: "シニアサポート大阪",
       status: "完了",
       rating: 4,
-      image: "/placeholder.svg?height=80&width=80",
+      image: "/sumiyosi.jpg?height=80&width=80",
     },
     {
       id: 3,
@@ -53,7 +53,7 @@ export default function ParticipantProfilePage() {
       organizer: "みんなの食堂",
       status: "参加予定",
       rating: null,
-      image: "/placeholder.svg?height=80&width=80",
+      image: "/tennnouzi.jpg?height=80&width=80",
     },
   ];
 

@@ -39,7 +39,7 @@ export const volunteerSeed = [
     location: "大阪府大阪市北区梅田",
     locationImageUrl:
       "https://drive.google.com/file/d/14olC8Wx3Jatg9O4mvg-vWt3UPRr904Ob/view?usp=sharing",
-    eventDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    eventDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
     currentPeople: 18,
     maxPeople: 25,
     description: "ステージ設営、案内、清掃などを行う地域夏祭りの支援活動です。",
@@ -54,7 +54,7 @@ export const volunteerSeed = [
     location: "大阪府大阪市北区扇町",
     locationImageUrl:
       "https://drive.google.com/file/d/1X6B8qqeF8LjrMYmFeP3PBOgNpMtQckfg/view?usp=sharing",
-    eventDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+    eventDate: new Date(Date.now() + 24 * 24 * 60 * 60 * 1000),
     currentPeople: 12,
     maxPeople: 15,
     description: "扇町公園で落ち葉清掃と花壇整備を行う緑化活動です。",
