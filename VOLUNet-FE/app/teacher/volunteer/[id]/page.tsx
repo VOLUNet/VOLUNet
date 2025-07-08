@@ -138,13 +138,6 @@ export default function TeacherVolunteerDetailPage() {
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/50 shadow-lg">
               <h2 className="text-xl font-bold text-slate-900 mb-4">主催者</h2>
               <div className="flex items-center space-x-4">
-                <Image
-                  src="/placeholder.svg?height=60&width=60"
-                  alt={volunteerActivity.organizer}
-                  width={60}
-                  height={60}
-                  className="rounded-xl border-2 border-white shadow-sm"
-                />
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-slate-900">
                     {volunteerActivity.organizer}
