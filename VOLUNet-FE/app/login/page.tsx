@@ -28,34 +28,23 @@ export default function LoginPage() {
     if (error) setError("")
   }
 
-  // ここではデモとして固定トークンを発行し保存するだけにしています
+  // 強制ログイン処理（バリデーションなし、ユーザー名は常に「motoya」）
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError("")
 
     try {
-      if (!formData.email || !formData.password) {
-        throw new Error("メールアドレスとパスワードを入力してください")
-      }
-
-      // ↓ここを本来はAPI通信に置き換え
-      // 簡単な認証チェック（例: emailに@test.com含む＆passwordが"password"のときのみ成功）
-      if (!formData.email.includes("@") || formData.password !== "password") {
-        throw new Error("メールアドレスまたはパスワードが正しくありません")
-      }
-
-      // 成功したらトークンを発行（デモ用に固定トークン）
       const fakeToken = "demo-token-1234567890"
 
       // ローカルストレージに保存
       localStorage.setItem("authToken", fakeToken)
-      localStorage.setItem("userEmail", formData.email)
+      localStorage.setItem("userEmail", formData.email || "guest@example.com")
+      localStorage.setItem("userName", "motoya")
 
       router.push("/")
     } catch (err) {
-      if (err instanceof Error) setError(err.message)
-      else setError("ログイン処理中にエラーが発生しました")
+      setError("ログインに失敗しました")
     } finally {
       setIsLoading(false)
     }
@@ -95,7 +84,6 @@ export default function LoginPage() {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
               />
             </div>
             <div>
@@ -107,12 +95,12 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleChange}
-                  required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
+                  aria-label={showPassword ? "パスワードを隠す" : "パスワードを表示"}
                 >
                   {showPassword ? <EyeOff /> : <Eye />}
                 </button>
