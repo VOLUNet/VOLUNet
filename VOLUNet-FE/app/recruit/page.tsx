@@ -1,15 +1,24 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, MapPin, Calendar, Clock, Info, Users, AlertCircle, LinkIcon } from "lucide-react"
+import {
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  Clock,
+  Info,
+  Users,
+  AlertCircle,
+  Upload,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+
+import { useImagePreviewStore } from "@/lib/store"
 
 export default function RecruitPage() {
   const router = useRouter()
@@ -25,44 +34,27 @@ export default function RecruitPage() {
     description: "",
   })
 
-  const [imageUrl, setImageUrl] = useState<string>("")
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const imagePreview = useImagePreviewStore((state) => state.imagePreview)
+  const setImagePreview = useImagePreviewStore((state) => state.setImagePreview)
 
-  // Google DriveのURLを共有可能な画像URLに変換する関数
-  const convertGoogleDriveUrl = (url: string): string => {
-    // Google DriveのファイルIDを抽出
-    const fileIdMatch = url.match(/\/d\/([a-zA-Z0-9-_]+)/)
-    if (fileIdMatch) {
-      const fileId = fileIdMatch[1]
-      return `https://drive.google.com/uc?export=view&id=${fileId}`
-    }
-    // 既に変換済みのURLまたは他のURL形式の場合はそのまま返す
-    return url
-  }
-
-  // Google Drive URLの処理
-  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value
-    setImageUrl(url)
-
-    if (url.trim()) {
-      const convertedUrl = convertGoogleDriveUrl(url)
-      setImagePreview(convertedUrl)
-    } else {
-      setImagePreview(null)
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
-  // 画像削除処理
   const handleImageRemove = () => {
-    setImageUrl("")
     setImagePreview(null)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // バリデーション
     if (!formData.activityName.trim()) {
       setError("ボランティア名を入力してください")
       return
@@ -80,10 +72,8 @@ export default function RecruitPage() {
       return
     }
 
-    // エラーをクリア
     setError(null)
 
-    // URLパラメータとして確認ページに渡す
     const params = new URLSearchParams({
       "activity-name": formData.activityName,
       location: formData.location,
@@ -93,21 +83,18 @@ export default function RecruitPage() {
       "max-participants": formData.maxParticipants,
       category: formData.category,
       description: formData.description,
-      "image-url": imageUrl || "",
       "has-image": imagePreview ? "true" : "false",
     })
 
     router.push(`/recruit/confirm?${params.toString()}`)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-
-    // 入力時にエラーをクリア
-    if (error) {
-      setError(null)
-    }
+    if (error) setError(null)
   }
 
   return (
@@ -116,15 +103,20 @@ export default function RecruitPage() {
         <div className="max-w-3xl mx-auto">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
-            <Link href="/" className="flex items-center text-slate-600 hover:text-slate-900 transition-colors group">
+            <Link
+              href="/"
+              className="flex items-center text-slate-600 hover:text-slate-900 transition-colors group"
+            >
               <ArrowLeft className="h-5 w-5 mr-2 group-hover:-translate-x-1 transition-transform" />
               <span className="font-medium">戻る</span>
             </Link>
-            <h1 className="text-2xl font-bold text-slate-900">ボランティアを募集する</h1>
-            <div className="w-20"></div> {/* Spacer for centering */}
+            <h1 className="text-2xl font-bold text-slate-900">
+              ボランティアを募集する
+            </h1>
+            <div className="w-20"></div>
           </div>
 
-          {/* Error Message */}
+          {/* エラー表示 */}
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center text-red-700">
               <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
@@ -132,15 +124,17 @@ export default function RecruitPage() {
             </div>
           )}
 
-          {/* Form Card */}
+          {/* フォーム */}
           <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/50 shadow-lg mb-8">
             <form onSubmit={handleSubmit}>
-              {/* Activity Name */}
+              {/* ボランティア名 */}
               <div className="mb-6">
-                <Label htmlFor="activityName" className="text-slate-700 font-medium mb-2 flex items-center">
+                <Label
+                  htmlFor="activityName"
+                  className="text-slate-700 font-medium mb-2 flex items-center"
+                >
                   <Info className="h-4 w-4 mr-2 text-slate-500" />
-                  ボランティア名
-                  <span className="text-red-500 ml-1">*</span>
+                  ボランティア名<span className="text-red-500 ml-1">*</span>
                 </Label>
                 <Input
                   id="activityName"
@@ -153,12 +147,14 @@ export default function RecruitPage() {
                 />
               </div>
 
-              {/* Category */}
+              {/* カテゴリ */}
               <div className="mb-6">
-                <Label htmlFor="category" className="text-slate-700 font-medium mb-2 flex items-center">
+                <Label
+                  htmlFor="category"
+                  className="text-slate-700 font-medium mb-2 flex items-center"
+                >
                   <Info className="h-4 w-4 mr-2 text-slate-500" />
-                  カテゴリ
-                  <span className="text-red-500 ml-1">*</span>
+                  カテゴリ<span className="text-red-500 ml-1">*</span>
                 </Label>
                 <select
                   id="category"
@@ -174,38 +170,47 @@ export default function RecruitPage() {
                 </select>
               </div>
 
-              {/* Activity Image from Google Drive */}
+              {/* 活動画像 */}
               <div className="mb-6">
-                <Label htmlFor="imageUrl" className="text-slate-700 font-medium mb-2 flex items-center">
-                  <LinkIcon className="h-4 w-4 mr-2 text-slate-500" />
-                  活動画像（Google Drive）
+                <Label
+                  htmlFor="image"
+                  className="text-slate-700 font-medium mb-2 flex items-center"
+                >
+                  <Info className="h-4 w-4 mr-2 text-slate-500" />
+                  活動画像
                   <span className="text-slate-500 ml-1 text-sm">(任意)</span>
                 </Label>
-                <Input
-                  id="imageUrl"
-                  name="imageUrl"
-                  type="url"
-                  value={imageUrl}
-                  onChange={handleImageUrlChange}
-                  placeholder="Google DriveのファイルURLを貼り付けてください"
-                  className="bg-white/80 border-slate-200 focus:border-slate-400 focus:ring-slate-400 rounded-xl h-12"
-                />
-                <p className="text-xs text-slate-500 mt-1">
-                  Google Driveで画像を右クリック → 「リンクを取得」→ 「リンクをコピー」したURLを貼り付けてください
-                </p>
-
-                {/* Image Preview */}
-                {imagePreview && (
-                  <div className="mt-4 relative">
+                {!imagePreview ? (
+                  <div className="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-slate-400 transition-colors">
+                    <input
+                      id="image"
+                      name="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <label
+                      htmlFor="image"
+                      className="cursor-pointer flex flex-col items-center space-y-2"
+                    >
+                      <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
+                        <Upload className="h-6 w-6 text-slate-400" />
+                      </div>
+                      <div className="text-slate-600">
+                        <span className="font-medium">クリックして画像をアップロード</span>
+                        <p className="text-sm text-slate-500 mt-1">
+                          PNG, JPG, GIF (最大10MB)
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="relative">
                     <img
                       src={imagePreview || "/placeholder.svg"}
                       alt="活動画像プレビュー"
                       className="w-full h-48 object-cover rounded-xl border-2 border-white shadow-sm"
-                      onError={(e) => {
-                        // 画像の読み込みに失敗した場合
-                        const target = e.target as HTMLImageElement
-                        target.src = "/placeholder.svg?height=200&width=400&text=画像を読み込めませんでした"
-                      }}
                     />
                     <button
                       type="button"
@@ -214,16 +219,34 @@ export default function RecruitPage() {
                     >
                       ×
                     </button>
+                    <div className="mt-2 text-center">
+                      <label
+                        htmlFor="image"
+                        className="text-sm text-slate-600 hover:text-slate-900 cursor-pointer underline"
+                      >
+                        画像を変更
+                      </label>
+                      <input
+                        id="image"
+                        name="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
 
-              {/* Location */}
+              {/* 開催場所 */}
               <div className="mb-6">
-                <Label htmlFor="location" className="text-slate-700 font-medium mb-2 flex items-center">
+                <Label
+                  htmlFor="location"
+                  className="text-slate-700 font-medium mb-2 flex items-center"
+                >
                   <MapPin className="h-4 w-4 mr-2 text-slate-500" />
-                  開催場所
-                  <span className="text-red-500 ml-1">*</span>
+                  開催場所<span className="text-red-500 ml-1">*</span>
                 </Label>
                 <Input
                   id="location"
@@ -236,13 +259,15 @@ export default function RecruitPage() {
                 />
               </div>
 
-              {/* Date and Time */}
+              {/* 日時 */}
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <Label htmlFor="date" className="text-slate-700 font-medium mb-2 flex items-center">
+                  <Label
+                    htmlFor="date"
+                    className="text-slate-700 font-medium mb-2 flex items-center"
+                  >
                     <Calendar className="h-4 w-4 mr-2 text-slate-500" />
-                    開催日
-                    <span className="text-red-500 ml-1">*</span>
+                    開催日<span className="text-red-500 ml-1">*</span>
                   </Label>
                   <Input
                     id="date"
@@ -255,10 +280,12 @@ export default function RecruitPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="timeHour" className="text-slate-700 font-medium mb-2 flex items-center">
+                  <Label
+                    htmlFor="timeHour"
+                    className="text-slate-700 font-medium mb-2 flex items-center"
+                  >
                     <Clock className="h-4 w-4 mr-2 text-slate-500" />
-                    開始時間
-                    <span className="text-red-500 ml-1">*</span>
+                    開始時間<span className="text-red-500 ml-1">*</span>
                   </Label>
                   <div className="flex items-center space-x-2">
                     <select
@@ -284,9 +311,9 @@ export default function RecruitPage() {
                       className="bg-white/80 border border-slate-200 focus:border-slate-400 focus:ring-slate-400 rounded-xl h-12 px-3 py-2 appearance-none flex-1 text-center"
                       required
                     >
-                      {[0, 15, 30, 45].map((minute) => (
-                        <option key={minute} value={minute.toString().padStart(2, "0")}>
-                          {minute.toString().padStart(2, "0")}
+                      {[0, 15, 30, 45].map((m) => (
+                        <option key={m} value={m.toString().padStart(2, "0")}>
+                          {m.toString().padStart(2, "0")}
                         </option>
                       ))}
                     </select>
@@ -294,12 +321,14 @@ export default function RecruitPage() {
                 </div>
               </div>
 
-              {/* Max Participants */}
+              {/* 募集人数 */}
               <div className="mb-6">
-                <Label htmlFor="maxParticipants" className="text-slate-700 font-medium mb-2 flex items-center">
+                <Label
+                  htmlFor="maxParticipants"
+                  className="text-slate-700 font-medium mb-2 flex items-center"
+                >
                   <Users className="h-4 w-4 mr-2 text-slate-500" />
-                  募集人数
-                  <span className="text-red-500 ml-1">*</span>
+                  募集人数<span className="text-red-500 ml-1">*</span>
                 </Label>
                 <Input
                   id="maxParticipants"
@@ -313,28 +342,32 @@ export default function RecruitPage() {
                   className="bg-white/80 border-slate-200 focus:border-slate-400 focus:ring-slate-400 rounded-xl h-12"
                   required
                 />
-                <p className="text-xs text-slate-500 mt-1">1〜100人の範囲で入力してください</p>
+                <p className="text-xs text-slate-500 mt-1">
+                  1〜100人の範囲で入力してください
+                </p>
               </div>
 
-              {/* Description */}
+              {/* 活動概要 */}
               <div className="mb-8">
-                <Label htmlFor="description" className="text-slate-700 font-medium mb-2 flex items-center">
+                <Label
+                  htmlFor="description"
+                  className="text-slate-700 font-medium mb-2 flex items-center"
+                >
                   <Info className="h-4 w-4 mr-2 text-slate-500" />
-                  活動概要
-                  <span className="text-red-500 ml-1">*</span>
+                  活動概要<span className="text-red-500 ml-1">*</span>
                 </Label>
                 <Textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="ボランティア活動の詳細を入力してください。参加者に伝えたい内容や持ち物、注意事項などを記載すると良いでしょう。"
+                  placeholder="ボランティア活動の詳細を入力してください..."
                   className="bg-white/80 border-slate-200 focus:border-slate-400 focus:ring-slate-400 rounded-xl min-h-[150px]"
                   required
                 />
               </div>
 
-              {/* Submit Button */}
+              {/* Submit */}
               <div className="flex justify-center">
                 <Button
                   type="submit"
@@ -346,25 +379,31 @@ export default function RecruitPage() {
             </form>
           </div>
 
-          {/* Tips Card */}
+          {/* Tips */}
           <div className="bg-blue-50/60 backdrop-blur-sm rounded-2xl p-6 border border-blue-100 shadow-sm">
-            <h3 className="text-lg font-semibold text-blue-800 mb-3">Google Drive画像の使い方</h3>
+            <h3 className="text-lg font-semibold text-blue-800 mb-3">
+              募集のヒント
+            </h3>
             <ul className="space-y-2 text-blue-700 text-sm">
               <li className="flex items-start">
                 <span className="inline-block w-4 h-4 bg-blue-200 rounded-full mr-2 mt-1 flex-shrink-0"></span>
-                Google Driveで画像ファイルを右クリックして「リンクを取得」を選択
+                ボランティア名はわかりやすく簡潔に
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-4 h-4 bg-blue-200 rounded-full mr-2 mt-1 flex-shrink-0"></span>
-                「リンクをコピー」をクリックしてURLをコピー
+                カテゴリは募集内容にあったものを選びましょう
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-4 h-4 bg-blue-200 rounded-full mr-2 mt-1 flex-shrink-0"></span>
-                コピーしたURLを上記の「活動画像」欄に貼り付け
+                活動画像があればより参加意欲が高まります
               </li>
               <li className="flex items-start">
                 <span className="inline-block w-4 h-4 bg-blue-200 rounded-full mr-2 mt-1 flex-shrink-0"></span>
-                画像が正しく表示されることを確認してください
+                開催日時は正確に入力してください
+              </li>
+              <li className="flex items-start">
+                <span className="inline-block w-4 h-4 bg-blue-200 rounded-full mr-2 mt-1 flex-shrink-0"></span>
+                活動概要は詳しく丁寧に書きましょう
               </li>
             </ul>
           </div>
