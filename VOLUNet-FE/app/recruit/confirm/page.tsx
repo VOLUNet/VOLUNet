@@ -106,7 +106,7 @@ export default function ConfirmPage() {
               onClick={handleSubmit}
               className="bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white rounded-xl px-12 py-6 text-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              送信
+              送信する
             </Button>
           </div>
         </div>
