@@ -1,35 +1,50 @@
-"use client"
+"use client";
 
-import React from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, MapPin, Calendar, Clock, Users, Info } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useImagePreviewStore } from "@/lib/store"
+import React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, MapPin, Calendar, Clock, Users, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useImagePreviewStore, useVolunteerStore } from "@/lib/store";
 
 export default function ConfirmPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const activityName = searchParams.get("activity-name") || ""
-  const location = searchParams.get("location") || ""
-  const date = searchParams.get("date") || ""
-  const timeHour = searchParams.get("time-hour") || "09"
-  const timeMinute = searchParams.get("time-minute") || "00"
-  const maxParticipants = searchParams.get("max-participants") || "15"
-  const category = searchParams.get("category") || ""
-  const description = searchParams.get("description") || ""
-  const hasImage = searchParams.get("has-image") === "true"
+  // 画面遷移で受け取る値
+  const activityName = searchParams.get("activity-name") || "";
+  const location = searchParams.get("location") || "";
+  const date = searchParams.get("date") || "";
+  const timeHour = searchParams.get("time-hour") || "09";
+  const timeMinute = searchParams.get("time-minute") || "00";
+  const maxParticipantsStr = searchParams.get("max-participants") || "15";
+  const maxParticipants = Number(maxParticipantsStr); // storeはnumber型
+  const category = searchParams.get("category") || "";
+  const description = searchParams.get("description") || "";
+  const hasImage = searchParams.get("has-image") === "true";
 
-  const imagePreview = useImagePreviewStore((state) => state.imagePreview)
-  const setImagePreview = useImagePreviewStore((state) => state.setImagePreview)
+  const imagePreview = useImagePreviewStore((state) => state.imagePreview);
+  const setImagePreview = useImagePreviewStore((state) => state.setImagePreview);
+  const addActivity = useVolunteerStore((state) => state.addActivity);
 
-  const handleBack = () => router.back()
+  const handleBack = () => router.back();
 
   const handleSubmit = () => {
-    // ここは画像アップロードやstore保存はなし。単純に遷移だけ。
-    setImagePreview(null)
-    router.push("/recruit/complete")
-  }
+    // 型定義のOmitに合わせて必要なフィールドだけ渡す
+    addActivity({
+      title: activityName,
+      organizer: "主催者名", // 固定値、フォームにあれば差し替え
+      date,
+      time: `${timeHour}:${timeMinute}`,
+      location,
+      maxParticipants,
+      category,
+      description,
+      image: hasImage ? imagePreview || "" : "",
+    });
+
+    setImagePreview(null);
+    router.push("/recruit/complete");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -97,5 +112,5 @@ export default function ConfirmPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }
