@@ -14,7 +14,7 @@ export interface VolunteerActivity {
   description: string;
   image: string;
   status: "募集中" | "終了";
-  sharedByTeacher: boolean;
+  isSharedToStudents: boolean;
 }
 
 interface VolunteerStore {
@@ -23,7 +23,7 @@ interface VolunteerStore {
   addActivity: (
     activity: Omit<
       VolunteerActivity,
-      "id" | "participants" | "status" | "sharedByTeacher"
+      "id" | "participants" | "status" | "isSharedToStudents"
     >
   ) => void;
   shareActivity: (id: number) => void;
@@ -45,7 +45,7 @@ const initialActivities: VolunteerActivity[] = [
       "大阪城公園周辺の清掃活動を行います。軍手とゴミ袋は主催者が用意いたします。",
     image: "/placeholder.svg",
     status: "募集中",
-    sharedByTeacher: false,
+    isSharedToStudents: false,
   },
   {
     id: 2,
@@ -60,7 +60,7 @@ const initialActivities: VolunteerActivity[] = [
     description: "高齢者の方々との交流や簡単なお手伝いをしていただきます。",
     image: "/placeholder.svg",
     status: "募集中",
-    sharedByTeacher: true,
+    isSharedToStudents: true,
   },
   {
     id: 3,
@@ -75,7 +75,7 @@ const initialActivities: VolunteerActivity[] = [
     description: "子ども食堂での調理補助や配膳のお手伝いをお願いします。",
     image: "/placeholder.svg",
     status: "募集中",
-    sharedByTeacher: false,
+    isSharedToStudents: false,
   },
   {
     id: 4,
@@ -90,7 +90,7 @@ const initialActivities: VolunteerActivity[] = [
     description: "図書の整理や修繕作業をお手伝いいただきます。",
     image: "/placeholder.svg",
     status: "募集中",
-    sharedByTeacher: true,
+    isSharedToStudents: true,
   },
   {
     id: 5,
@@ -105,7 +105,7 @@ const initialActivities: VolunteerActivity[] = [
     description: "動物のお世話や施設の清掃をお手伝いいただきます。",
     image: "/placeholder.svg",
     status: "募集中",
-    sharedByTeacher: false,
+    isSharedToStudents: false,
   },
   {
     id: 6,
@@ -120,9 +120,20 @@ const initialActivities: VolunteerActivity[] = [
     description: "災害復興のための清掃作業や物資配布のお手伝いをお願いします。",
     image: "/placeholder.svg",
     status: "募集中",
-    sharedByTeacher: false,
+    isSharedToStudents: false,
   },
 ];
+
+// Imageプレビュー用ストア
+interface ImagePreviewState {
+  imagePreview: string | null;
+  setImagePreview: (url: string | null) => void;
+}
+
+export const useImagePreviewStore = create<ImagePreviewState>((set) => ({
+  imagePreview: null,
+  setImagePreview: (url) => set({ imagePreview: url }),
+}));
 
 export const useVolunteerStore = create<VolunteerStore>()(
   persist(
@@ -137,7 +148,7 @@ export const useVolunteerStore = create<VolunteerStore>()(
           id: get().getNextId(),
           participants: 0,
           status: "募集中",
-          sharedByTeacher: false,
+          isSharedToStudents: false,
         };
         set((state) => ({
           activities: [...state.activities, newActivity],
@@ -148,7 +159,7 @@ export const useVolunteerStore = create<VolunteerStore>()(
         set((state) => ({
           activities: state.activities.map((activity) =>
             activity.id === id
-              ? { ...activity, sharedByTeacher: true }
+              ? { ...activity, isSharedToStudents: true }
               : activity
           ),
         }));

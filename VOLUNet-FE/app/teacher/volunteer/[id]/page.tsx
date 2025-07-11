@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useVolunteerStore, type VolunteerActivity } from "@/lib/store";
 import { useParams } from "next/navigation";
+import axios from "axios";
 
 export default function TeacherVolunteerDetailPage() {
   const activities = useVolunteerStore((state) => state.activities);
@@ -34,9 +35,21 @@ export default function TeacherVolunteerDetailPage() {
   }, [activities, id]);
 
   // 共有処理
-  const handleShare = () => {
-    if (volunteerActivity) {
+  const handleShare = async () => {
+    if (!volunteerActivity) return;
+
+    try {
+      const response = await axios.put(
+        `http://localhost:8787/volunteer/${volunteerActivity.id}`
+      );
+      console.log(response.data.message); // 成功メッセージの表示（任意）
+
+      // storeの状態を更新する（必要であれば）
       shareActivity(volunteerActivity.id);
+      // alert("生徒に共有しました！");
+    } catch (error) {
+      console.error("共有エラー:", error);
+      // alert("共有に失敗しました。");
     }
   };
 
@@ -92,7 +105,7 @@ export default function TeacherVolunteerDetailPage() {
                   height={300}
                   className="w-full h-64 object-cover rounded-2xl"
                 />
-                {volunteerActivity.sharedByTeacher && (
+                {volunteerActivity.isSharedToStudents && (
                   <div className="absolute top-4 right-4">
                     <div className="flex items-center space-x-2 px-3 py-1 bg-green-100/90 backdrop-blur-sm rounded-lg">
                       <CheckCircle className="h-4 w-4 text-green-600" />
@@ -167,7 +180,7 @@ export default function TeacherVolunteerDetailPage() {
             {/* Teacher Action */}
             <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-white/50 shadow-lg">
               <div className="text-center">
-                {volunteerActivity.sharedByTeacher ? (
+                {volunteerActivity.isSharedToStudents ? (
                   <>
                     <h3 className="text-lg font-semibold text-green-700 mb-4 flex items-center justify-center">
                       <CheckCircle className="h-5 w-5 mr-2" />

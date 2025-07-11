@@ -40,6 +40,7 @@ export default function TeacherVolunteerListPage() {
     eventDate: string;
     location: string;
     locationImageUrl: string;
+    isSharedToStudents: boolean;
   };
 
   // 初期化時にストアからデータを取得
@@ -72,7 +73,7 @@ export default function TeacherVolunteerListPage() {
               description: item.description,
               image: convertGoogleDriveUrl(item.locationImageUrl),
               status: "募集中",
-              sharedByTeacher: true,
+              isSharedToStudents: item.isSharedToStudents,
             };
           }
         );
@@ -126,7 +127,7 @@ export default function TeacherVolunteerListPage() {
               件のボランティア活動があります
               <span className="ml-4 text-sm">
                 （共有済み:{" "}
-                {volunteerActivities.filter((a) => a.sharedByTeacher).length}
+                {volunteerActivities.filter((a) => a.isSharedToStudents).length}
                 件）
               </span>
             </p>
@@ -149,7 +150,7 @@ export default function TeacherVolunteerListPage() {
                     className="w-full h-32 object-cover rounded-2xl"
                   />
 
-                  {activity.sharedByTeacher && (
+                  {activity.isSharedToStudents && (
                     <div className="absolute top-3 right-3">
                       <CheckCircle className="h-6 w-6 text-green-500 bg-white rounded-full" />
                     </div>
@@ -192,7 +193,7 @@ export default function TeacherVolunteerListPage() {
                   <div className="pt-4">
                     <Link href={`/teacher/volunteer/${activity.id}`}>
                       <Button className="w-full bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white rounded-xl py-2 text-sm font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center justify-center">
-                        {activity.sharedByTeacher ? (
+                        {activity.isSharedToStudents ? (
                           <>
                             <CheckCircle className="h-4 w-4 mr-2" />
                             共有済み・詳細確認

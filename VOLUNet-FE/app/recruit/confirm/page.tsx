@@ -4,7 +4,7 @@ import React from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, MapPin, Calendar, Clock, Users, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useImagePreviewStore, useVolunteerStore } from "@/lib/store";
+import { useImagePreviewStore } from "@/lib/store";
 
 export default function ConfirmPage() {
   const router = useRouter();
@@ -22,26 +22,39 @@ export default function ConfirmPage() {
   const hasImage = searchParams.get("has-image") === "true";
 
   const imagePreview = useImagePreviewStore((state) => state.imagePreview);
-  const setImagePreview = useImagePreviewStore((state) => state.setImagePreview);
-  const addActivity = useVolunteerStore((state) => state.addActivity);
+  const setImagePreview = useImagePreviewStore(
+    (state) => state.setImagePreview
+  );
+  // const addActivity = useVolunteerStore((state) => state.addActivity);
 
   const handleBack = () => router.back();
 
-  const handleSubmit = () => {
-    addActivity({
-      title: activityName,
-      organizer: "主催者名",
-      date,
-      time: `${timeHour}:${timeMinute}`,
-      location,
-      maxParticipants,
-      category,
-      description,
-      image: hasImage ? imagePreview || "" : "",
-    });
+  const handleSubmit = async () => {
+    try {
+      await fetch("http://localhost:8787/volunteer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          volunteerName: activityName,
+          organizationName: "杉村志弥", // 実際はログインユーザー名など
+          location,
+          locationImageUrl: hasImage ? imagePreview || "" : "",
+          eventDate: date,
+          maxPeople: maxParticipants,
+          category,
+          description,
+          userId: "your-user-id", // ログインユーザーのIDを入れる
+        }),
+      });
 
-    setImagePreview(null);
-    router.push("/recruit/complete");
+      setImagePreview(null);
+      router.push("/recruit/complete");
+    } catch (error) {
+      console.error("保存失敗:", error);
+      alert("登録に失敗しました");
+    }
   };
 
   return (
@@ -69,7 +82,9 @@ export default function ConfirmPage() {
               />
             )}
             <div>
-              <h2 className="text-xl font-semibold text-slate-900 mb-2">{activityName}</h2>
+              <h2 className="text-xl font-semibold text-slate-900 mb-2">
+                {activityName}
+              </h2>
               <p className="text-slate-700">{description}</p>
             </div>
 
@@ -84,7 +99,9 @@ export default function ConfirmPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <Clock className="w-5 h-5" />
-                <span>{timeHour}:{timeMinute}</span>
+                <span>
+                  {timeHour}:{timeMinute}
+                </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5" />
