@@ -1,35 +1,48 @@
-"use client"
+"use client";
 
-import React from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, MapPin, Calendar, Clock, Users, Info } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useImagePreviewStore } from "@/lib/store"
+import React from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowLeft, MapPin, Calendar, Clock, Users, Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useImagePreviewStore, useVolunteerStore } from "@/lib/store";
 
 export default function ConfirmPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const activityName = searchParams.get("activity-name") || ""
-  const location = searchParams.get("location") || ""
-  const date = searchParams.get("date") || ""
-  const timeHour = searchParams.get("time-hour") || "09"
-  const timeMinute = searchParams.get("time-minute") || "00"
-  const maxParticipants = searchParams.get("max-participants") || "15"
-  const category = searchParams.get("category") || ""
-  const description = searchParams.get("description") || ""
-  const hasImage = searchParams.get("has-image") === "true"
+  const activityName = searchParams.get("activity-name") || "";
+  const location = searchParams.get("location") || "";
+  const date = searchParams.get("date") || "";
+  const timeHour = searchParams.get("time-hour") || "09";
+  const timeMinute = searchParams.get("time-minute") || "00";
+  const maxParticipantsStr = searchParams.get("max-participants") || "15";
+  const maxParticipants = Number(maxParticipantsStr);
+  const category = searchParams.get("category") || "";
+  const description = searchParams.get("description") || "";
+  const hasImage = searchParams.get("has-image") === "true";
 
-  const imagePreview = useImagePreviewStore((state) => state.imagePreview)
-  const setImagePreview = useImagePreviewStore((state) => state.setImagePreview)
+  const imagePreview = useImagePreviewStore((state) => state.imagePreview);
+  const setImagePreview = useImagePreviewStore((state) => state.setImagePreview);
+  const addActivity = useVolunteerStore((state) => state.addActivity);
 
-  const handleBack = () => router.back()
+  const handleBack = () => router.back();
 
   const handleSubmit = () => {
-    // ここは画像アップロードやstore保存はなし。単純に遷移だけ。
-    setImagePreview(null)
-    router.push("/recruit/complete")
-  }
+    addActivity({
+      title: activityName,
+      organizer: "主催者名",
+      date,
+      time: `${timeHour}:${timeMinute}`,
+      location,
+      maxParticipants,
+      category,
+      description,
+      image: hasImage ? imagePreview || "" : "",
+    });
+
+    setImagePreview(null);
+    router.push("/recruit/complete");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -71,9 +84,7 @@ export default function ConfirmPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <Clock className="w-5 h-5" />
-                <span>
-                  {timeHour}:{timeMinute}
-                </span>
+                <span>{timeHour}:{timeMinute}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5" />
@@ -91,11 +102,11 @@ export default function ConfirmPage() {
               onClick={handleSubmit}
               className="bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 text-white rounded-xl px-12 py-6 text-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1"
             >
-              送信
+              送信する
             </Button>
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
