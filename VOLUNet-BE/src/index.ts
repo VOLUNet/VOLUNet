@@ -112,6 +112,7 @@ app.get("/volunteer-list", async (c) => {
         eventDate: result.eventDate,
         location: result.location,
         locationImageUrl: result.locationImageUrl,
+        isSharedToStudents: result.isSharedToStudents,
       }));
 
       return c.json(response);
@@ -130,6 +131,7 @@ app.get("/volunteer-list", async (c) => {
         eventDate: result.eventDate,
         location: result.location,
         locationImageUrl: result.locationImageUrl,
+        isSharedToStudents: result.isSharedToStudents,
       }));
 
       return c.json(response);
@@ -144,6 +146,7 @@ app.get("/volunteer-list", async (c) => {
         eventDate: result.eventDate,
         location: result.location,
         locationImageUrl: result.locationImageUrl,
+        isSharedToStudents: result.isSharedToStudents,
       }));
 
       return c.json(response);

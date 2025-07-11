@@ -62,7 +62,7 @@ export default function SearchPage() {
               description: item.description,
               image: convertGoogleDriveUrl(item.locationImageUrl),
               status: "募集中",
-              sharedByTeacher: true,
+              isSharedToStudents: true,
             };
           }
         );
