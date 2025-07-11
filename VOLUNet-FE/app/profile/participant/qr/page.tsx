@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button"
 export default function QrCodePage() {
   // サンプルデータ
   const user = {
-    name: "佐藤 花子",
-    avatar: "/placeholder.svg?height=120&width=120",
+    name: "杉村　志弥",
+    avatar: "/ruru.jpg?height=120&width=120",
   }
 
   return (
@@ -37,7 +37,7 @@ export default function QrCodePage() {
             <div className="bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-inner mx-auto w-64 h-64 flex items-center justify-center mb-6">
               <div className="relative w-56 h-56">
                 <Image
-                  src="/placeholder.svg?height=224&width=224&text=QR+Code"
+                  src="/qrcode.png?height=224&width=224&text=QR+Code"
                   alt="QR Code"
                   fill
                   className="object-contain"

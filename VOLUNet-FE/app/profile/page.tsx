@@ -7,7 +7,7 @@ export default function ProfilePage() {
   // サンプルデータ
   const user = {
     name: "田中 太郎",
-    avatar: "/placeholder.svg?height=120&width=120",
+    avatar: "/ruru.jpg?height=120&width=120",
     rating: 4.8,
     reviewCount: 24,
     participationCount: 36, // 参加数を追加
@@ -74,7 +74,7 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div className="relative">
                 <Image
-                  src={user.avatar || "/placeholder.svg"}
+                  src={user.avatar || "/ruru.jpg"}
                   alt={user.name}
                   width={120}
                   height={120}

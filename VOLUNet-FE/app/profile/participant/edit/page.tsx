@@ -17,8 +17,8 @@ export default function ProfileEditPage() {
 
   // サンプルデータ（実際はデータベースから取得）
   const [profile, setProfile] = useState({
-    name: "佐藤 花子",
-    avatar: "/placeholder.svg?height=120&width=120",
+    name: "杉村　志弥",
+    avatar: "/ruru.jpg?height=120&width=120",
     location: "大阪府大阪市",
     bio: "大学生です。環境問題に関心があり、地域のボランティア活動に積極的に参加しています。",
     email: "hanako.sato@example.com",

@@ -10,14 +10,13 @@ export default function ConfirmPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 画面遷移で受け取る値
   const activityName = searchParams.get("activity-name") || "";
   const location = searchParams.get("location") || "";
   const date = searchParams.get("date") || "";
   const timeHour = searchParams.get("time-hour") || "09";
   const timeMinute = searchParams.get("time-minute") || "00";
   const maxParticipantsStr = searchParams.get("max-participants") || "15";
-  const maxParticipants = Number(maxParticipantsStr); // storeはnumber型
+  const maxParticipants = Number(maxParticipantsStr);
   const category = searchParams.get("category") || "";
   const description = searchParams.get("description") || "";
   const hasImage = searchParams.get("has-image") === "true";
@@ -29,10 +28,9 @@ export default function ConfirmPage() {
   const handleBack = () => router.back();
 
   const handleSubmit = () => {
-    // 型定義のOmitに合わせて必要なフィールドだけ渡す
     addActivity({
       title: activityName,
-      organizer: "主催者名", // 固定値、フォームにあれば差し替え
+      organizer: "主催者名",
       date,
       time: `${timeHour}:${timeMinute}`,
       location,
