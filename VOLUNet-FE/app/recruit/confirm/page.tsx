@@ -84,9 +84,7 @@ export default function ConfirmPage() {
               </div>
               <div className="flex items-center space-x-2">
                 <Clock className="w-5 h-5" />
-                <span>
-                  {timeHour}:{timeMinute}
-                </span>
+                <span>{timeHour}:{timeMinute}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="w-5 h-5" />
