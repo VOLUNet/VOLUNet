@@ -5,26 +5,75 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Calendar, MapPin, Users, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { type VolunteerActivity } from "@/lib/store";
+import { useVolunteerStore, type VolunteerActivity } from "@/lib/store";
 import axios from "axios";
 
 export default function SearchPage() {
   const [volunteerActivities, setVolunteerActivities] = useState<
     VolunteerActivity[]
   >([]);
+  const setActivities = useVolunteerStore((state) => state.setActivities);
+
+  //googleドライブからのURLから表示できる形式に変更
+  function convertGoogleDriveUrl(url: string) {
+    const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (match && match[1]) {
+      return `https://drive.google.com/uc?export=view&id=${match[1]}`;
+    }
+    return url; // 変換できなければそのまま返す
+  }
+
+  type RawVolunteer = {
+    id: number;
+    volunteerName: string;
+    description: string;
+    organizationName: string;
+    eventDate: string;
+    location: string;
+    locationImageUrl: string;
+  };
 
   // 初期化時にストアからデータを取得
   useEffect(() => {
-    // 募集中かつ先生によって共有されたボランティアのみ表示
     axios
       .get("http://localhost:8787/volunteer-list?student=true")
       .then((response) => {
-        setVolunteerActivities(response.data);
+        const mappedActivities: VolunteerActivity[] = response.data.map(
+          (item: RawVolunteer) => {
+            const event = new Date(item.eventDate);
+            return {
+              id: item.id,
+              title: item.volunteerName,
+              organizer: item.organizationName,
+              date: event.toLocaleDateString("ja-JP", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              }), // 例: 2025/07/01
+              time: event.toLocaleTimeString("ja-JP", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              }), // 例: 11:48
+              location: item.location,
+              participants: 0,
+              maxParticipants: 0,
+              category: "", // APIにないので空文字
+              description: item.description,
+              image: convertGoogleDriveUrl(item.locationImageUrl),
+              status: "募集中",
+              sharedByTeacher: true,
+            };
+          }
+        );
+        setVolunteerActivities(mappedActivities);
+        setActivities(mappedActivities);
       })
+
       .catch((error) => {
         console.error("ボランティア取得エラー", error);
       });
-  }, []);
+  }, [setActivities]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -75,17 +124,15 @@ export default function SearchPage() {
                 {/* Activity Image */}
                 <div className="relative mb-4">
                   <Image
-                    src={activity.image || "/placeholder.svg"}
+                    src={
+                      convertGoogleDriveUrl(activity.image || "") ||
+                      "/placeholder.svg"
+                    }
                     alt={activity.title}
                     width={120}
                     height={120}
                     className="w-full h-32 object-cover rounded-2xl"
                   />
-                  <div className="absolute top-3 left-3">
-                    <span className="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-xs font-medium text-slate-700">
-                      {activity.category}
-                    </span>
-                  </div>
                   <div className="absolute top-3 right-3">
                     <span className="px-2 py-1 bg-green-100/90 backdrop-blur-sm rounded-lg text-xs font-medium text-green-700">
                       先生推奨

@@ -69,3 +69,14 @@ export default function CompletePage() {
     </div>
   )
 }
+
+      {/* ホーム画面へ戻るリンク */}
+      <a
+        href="/"
+        className="inline-block bg-blue-700 text-white px-6 py-3 rounded hover:bg-blue-800"
+      >
+        ホームに戻る
+      </a>
+    </main>
+  )
+
